@@ -10,7 +10,7 @@ import {
   Bars3Icon,
   XMarkIcon,
   ArrowRightOnRectangleIcon,
-  UserPlusIcon,
+  TrophyIcon,
 } from "@heroicons/react/24/outline";
 import { useAuth } from "../../contexts/AuthContext";
 
@@ -20,14 +20,15 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
 
   const menuItems = [
     { id: "home", name: "Trang chủ", icon: HomeIcon },
+    { id: "contests", name: "Cuộc thi", icon: TrophyIcon },
     { id: "my-courses", name: "Khóa học của tôi", icon: BookOpenIcon },
     { id: "chat", name: "Chat tư vấn", icon: ChatBubbleLeftRightIcon },
     { id: "settings", name: "Cài đặt", icon: Cog6ToothIcon },
   ];
 
-  // Menu cho người chưa đăng nhập (ẩn khóa học của tôi và cài đặt)
   const publicMenuItems = [
     { id: "home", name: "Trang chủ", icon: HomeIcon },
+    { id: "contests", name: "Cuộc thi", icon: TrophyIcon },
     { id: "chat", name: "Chat tư vấn", icon: ChatBubbleLeftRightIcon },
   ];
 
@@ -39,13 +40,10 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
-            <a href="/" className="flex items-center space-x-3 cursor-pointer">
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full blur-lg opacity-70 animate-pulse"></div>
-                <AcademicCapIcon className="relative h-8 w-8 text-white" />
-              </div>
+            <a href="/" className="flex items-center space-x-3">
+              <AcademicCapIcon className="h-8 w-8 text-white" />
               <div>
-                <h1 className="text-xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                <h1 className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
                   TvT Learn
                 </h1>
                 <p className="text-xs text-gray-400 hidden sm:block">
@@ -54,7 +52,7 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
               </div>
             </a>
 
-            {/* Desktop Menu - hiển thị cho cả đã login và chưa login */}
+            {/* Desktop Menu */}
             <div className="hidden md:flex items-center space-x-1">
               {displayMenuItems.map((item) => {
                 const Icon = item.icon;
@@ -63,69 +61,57 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
                   <button
                     key={item.id}
                     onClick={() => setActiveTab(item.id)}
-                    className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-300 ${
+                    className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all ${
                       isActive
-                        ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg"
+                        ? "bg-blue-600 text-white"
                         : "text-gray-300 hover:text-white hover:bg-white/10"
                     }`}
                   >
                     <Icon className="h-5 w-5" />
-                    <span className="font-medium">{item.name}</span>
+                    <span>{item.name}</span>
                   </button>
                 );
               })}
             </div>
 
-            {/* Right side - Auth Buttons or User Info */}
+            {/* User / Auth */}
             <div className="flex items-center space-x-4">
               {user ? (
-                <>
-                  <div className="hidden md:flex items-center space-x-3 cursor-pointer group">
-                    <div className="relative">
-                      <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                      <UserCircleIcon className="relative h-8 w-8 text-gray-300 group-hover:text-white transition-colors duration-300" />
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm font-semibold text-white">
-                        {user.name}
-                      </p>
-                      <div className="flex items-center space-x-1">
-                        <SparklesIcon className="h-3 w-3 text-yellow-400" />
-                        <span className="text-xs text-gray-400">
-                          {user.points || 0} điểm
-                        </span>
-                      </div>
-                    </div>
+                <div className="hidden md:flex items-center space-x-3">
+                  <UserCircleIcon className="h-8 w-8 text-gray-300" />
+                  <div>
+                    <p className="text-sm font-semibold text-white">
+                      {user.name}
+                    </p>
+                    <p className="text-xs text-gray-400">
+                      {user.points || 0} điểm
+                    </p>
                   </div>
                   <button
                     onClick={logout}
-                    className="hidden md:flex items-center space-x-2 px-4 py-2 rounded-lg text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all duration-300"
+                    className="text-red-400 hover:text-red-300"
                   >
                     <ArrowRightOnRectangleIcon className="h-5 w-5" />
-                    <span>Đăng xuất</span>
                   </button>
-                </>
+                </div>
               ) : (
                 <div className="hidden md:flex items-center space-x-3">
-                  <a
-                    href="/login"
-                    className="px-4 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-white/10 transition-all duration-300"
-                  >
+                  <a href="/login" className="text-gray-300 hover:text-white">
                     Đăng nhập
                   </a>
                   <a
                     href="/register"
-                    className="px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:shadow-lg transition-all duration-300"
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg"
                   >
                     Đăng ký
                   </a>
                 </div>
               )}
 
-              {/* Mobile Menu Button */}
+              {/* Mobile button */}
               <button
                 onClick={() => setIsMobileOpen(!isMobileOpen)}
-                className="md:hidden p-2 rounded-lg text-white hover:bg-white/10 transition-colors"
+                className="md:hidden p-2 text-white"
               >
                 {isMobileOpen ? (
                   <XMarkIcon className="h-6 w-6" />
@@ -139,90 +125,22 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
 
         {/* Mobile Menu */}
         {isMobileOpen && (
-          <div className="md:hidden bg-gray-800 border-t border-gray-700 py-2 max-h-[80vh] overflow-y-auto">
-            {user ? (
-              <>
-                <div className="flex items-center space-x-3 px-6 py-4 border-b border-gray-700">
-                  <UserCircleIcon className="h-10 w-10 text-gray-400" />
-                  <div>
-                    <p className="font-semibold text-white">{user.name}</p>
-                    <p className="text-xs text-gray-400">{user.email}</p>
-                  </div>
-                </div>
-                {menuItems.map((item) => {
-                  const Icon = item.icon;
-                  const isActive = activeTab === item.id;
-                  return (
-                    <button
-                      key={item.id}
-                      onClick={() => {
-                        setActiveTab(item.id);
-                        setIsMobileOpen(false);
-                      }}
-                      className={`w-full flex items-center space-x-3 px-6 py-3 transition-all duration-200 ${
-                        isActive
-                          ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white"
-                          : "text-gray-300 hover:bg-white/10"
-                      }`}
-                    >
-                      <Icon className="h-5 w-5" />
-                      <span>{item.name}</span>
-                    </button>
-                  );
-                })}
-                <button
-                  onClick={() => {
-                    logout();
-                    setIsMobileOpen(false);
-                  }}
-                  className="w-full flex items-center space-x-3 px-6 py-3 text-red-400 hover:bg-red-500/10 transition-all duration-200"
-                >
-                  <ArrowRightOnRectangleIcon className="h-5 w-5" />
-                  <span>Đăng xuất</span>
-                </button>
-              </>
-            ) : (
-              <div className="flex flex-col gap-2 p-4">
-                <a
-                  href="/"
-                  onClick={() => setIsMobileOpen(false)}
-                  className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-300 hover:text-white hover:bg-white/10 transition-all duration-300"
-                >
-                  <HomeIcon className="h-5 w-5" />
-                  <span>Trang chủ</span>
-                </a>
-                <a
-                  href="/chat"
-                  onClick={() => {
-                    setActiveTab("chat");
-                    setIsMobileOpen(false);
-                  }}
-                  className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-300 hover:text-white hover:bg-white/10 transition-all duration-300"
-                >
-                  <ChatBubbleLeftRightIcon className="h-5 w-5" />
-                  <span>Chat tư vấn</span>
-                </a>
-                <div className="border-t border-gray-700 my-2"></div>
-                <a
-                  href="/login"
-                  className="w-full text-center px-4 py-3 rounded-lg text-gray-300 hover:text-white hover:bg-white/10 transition-all duration-300"
-                  onClick={() => setIsMobileOpen(false)}
-                >
-                  Đăng nhập
-                </a>
-                <a
-                  href="/register"
-                  className="w-full text-center px-4 py-3 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:shadow-lg transition-all duration-300"
-                  onClick={() => setIsMobileOpen(false)}
-                >
-                  Đăng ký
-                </a>
-              </div>
-            )}
+          <div className="md:hidden bg-gray-800 p-4">
+            {displayMenuItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => {
+                  setActiveTab(item.id);
+                  setIsMobileOpen(false);
+                }}
+                className="w-full text-left px-4 py-2 text-gray-300 hover:text-white"
+              >
+                {item.name}
+              </button>
+            ))}
           </div>
         )}
       </nav>
-
       <div className="h-16"></div>
     </>
   );

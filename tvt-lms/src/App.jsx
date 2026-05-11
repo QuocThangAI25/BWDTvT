@@ -4,7 +4,8 @@ import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import Dashboard from "./components/Dashboard";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-
+import Contests from "./pages/Contests";
+import ContestDetail from "./pages/ContestDetail";
 function AppContent() {
   const { user } = useAuth();
 
@@ -13,6 +14,8 @@ function AppContent() {
       <Route path="/" element={<Dashboard />} />
       <Route path="/login" element={user ? <Dashboard /> : <Login />} />
       <Route path="/register" element={user ? <Dashboard /> : <Register />} />
+      <Route path="/contests" element={<Contests />} />
+      <Route path="/contest/:slug" element={<ContestDetail />} />
     </Routes>
   );
 }

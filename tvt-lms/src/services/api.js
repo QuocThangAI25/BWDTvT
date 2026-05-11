@@ -21,4 +21,14 @@ api.interceptors.request.use(
   (error) => Promise.reject(error),
 );
 
+// ========== CONTEST APIS ==========
+export const getContests = (params) => api.get("/contests", { params });
+export const getContestBySlug = (slug) => api.get(`/contests/${slug}`);
+export const registerContest = (contestId) =>
+  api.post(`/contests/${contestId}/register`);
+export const submitChallenge = (contestId, data) =>
+  api.post(`/contests/${contestId}/submit`, data);
+export const getLeaderboard = (contestId) =>
+  api.get(`/contests/${contestId}/leaderboard`);
+
 export default api;
