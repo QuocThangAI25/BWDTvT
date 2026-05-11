@@ -6,9 +6,20 @@ import {
   StarIcon,
 } from "@heroicons/react/24/outline";
 import { StarIcon as StarSolidIcon } from "@heroicons/react/24/solid";
+import { useNavigate } from "react-router-dom";
 
 const CourseCard = ({ course, type = "ongoing" }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const navigate = useNavigate();
+  const handleCardClick = () => {
+    const courseId = course.id || 1; 
+
+    if (type === "ongoing") {
+      navigate(`/course/${courseId}/learn`); // Nhảy vào trang có video học
+    } else {
+      navigate(`/course/${courseId}`); // Nhảy vào trang giới thiệu để mua
+    }
+  };
   const {
     title,
     instructor,
@@ -23,6 +34,7 @@ const CourseCard = ({ course, type = "ongoing" }) => {
   if (type === "ongoing") {
     return (
       <div
+        onClick={handleCardClick}
         className="group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden cursor-pointer"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}

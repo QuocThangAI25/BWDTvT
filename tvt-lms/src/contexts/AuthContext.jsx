@@ -36,8 +36,9 @@ export const AuthProvider = ({ children }) => {
       setUser(response.data.user);
       return { success: true };
     } catch (error) {
-      setError(error.response?.data?.message || "Đăng ký thất bại");
-      return { success: false, error: error.response?.data?.message };
+      const errorMessage = error.response?.data?.error || "Đăng ký thất bại, vui lòng thử lại.";
+      setError(errorMessage);
+      return { success: false, error: errorMessage };
     }
   };
 
@@ -49,14 +50,17 @@ export const AuthProvider = ({ children }) => {
       setUser(response.data.user);
       return { success: true };
     } catch (error) {
-      setError(error.response?.data?.message || "Đăng nhập thất bại");
-      return { success: false, error: error.response?.data?.message };
+      const errorMessage = error.response?.data?.error || "Đăng nhập thất bại, vui lòng kiểm tra kết nối.";
+      setError(errorMessage);
+      return { success: false, error: errorMessage };
     }
   };
 
+  // ✅ Đã cập nhật hàm logout: Xóa dữ liệu và chuyển về trang login
   const logout = () => {
     localStorage.removeItem("token");
     setUser(null);
+    window.location.href = "/login"; 
   };
 
   return (

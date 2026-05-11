@@ -16,6 +16,7 @@ import Contests from "../pages/Contests";
 
 const Dashboard = () => {
   const { user } = useAuth();
+  console.log("CHECK DỮ LIỆU USER TRONG CODE:", user);
   const [activeTab, setActiveTab] = useState("home");
   const [searchTerm, setSearchTerm] = useState("");
   const [greeting, setGreeting] = useState("");

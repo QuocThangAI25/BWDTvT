@@ -5,7 +5,6 @@ import {
   ChatBubbleLeftRightIcon,
   Cog6ToothIcon,
   UserCircleIcon,
-  SparklesIcon,
   AcademicCapIcon,
   Bars3Icon,
   XMarkIcon,
@@ -17,6 +16,14 @@ import { useAuth } from "../../contexts/AuthContext";
 const Sidebar = ({ activeTab, setActiveTab }) => {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const { user, logout } = useAuth();
+
+  // 🌟 Hàm tính câu chào theo thời gian thực
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Chào buổi sáng";
+    if (hour < 18) return "Chào buổi chiều";
+    return "Chào buổi tối";
+  };
 
   const menuItems = [
     { id: "home", name: "Trang chủ", icon: HomeIcon },
@@ -74,14 +81,21 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
               })}
             </div>
 
-            {/* User / Auth */}
+            {/* User / Auth (Desktop) */}
             <div className="flex items-center space-x-4">
               {user ? (
                 <div className="hidden md:flex items-center space-x-3">
-                  <UserCircleIcon className="h-8 w-8 text-gray-300" />
+                  {/* Hiển thị Avatar */}
+                  {user.avatar ? (
+                    <img src={user.avatar} alt="Avatar" className="h-8 w-8 rounded-full object-cover border border-gray-600" />
+                  ) : (
+                    <UserCircleIcon className="h-8 w-8 text-gray-300" />
+                  )}
+                  
                   <div>
+                    {/* ✅ HIỂN THỊ CÂU CHÀO THEO GIỜ Ở ĐÂY (Desktop) */}
                     <p className="text-sm font-semibold text-white">
-                      {user.name}
+                      {getGreeting()}, {user.name}!
                     </p>
                     <p className="text-xs text-gray-400">
                       {user.points || 0} điểm
@@ -89,7 +103,8 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
                   </div>
                   <button
                     onClick={logout}
-                    className="text-red-400 hover:text-red-300"
+                    title="Đăng xuất"
+                    className="text-red-400 hover:text-red-300 p-2 rounded-lg hover:bg-white/5 transition-colors"
                   >
                     <ArrowRightOnRectangleIcon className="h-5 w-5" />
                   </button>
@@ -101,7 +116,7 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
                   </a>
                   <a
                     href="/register"
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg"
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
                   >
                     Đăng ký
                   </a>
@@ -125,19 +140,56 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
 
         {/* Mobile Menu */}
         {isMobileOpen && (
-          <div className="md:hidden bg-gray-800 p-4">
-            {displayMenuItems.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => {
-                  setActiveTab(item.id);
-                  setIsMobileOpen(false);
-                }}
-                className="w-full text-left px-4 py-2 text-gray-300 hover:text-white"
-              >
-                {item.name}
-              </button>
-            ))}
+          <div className="md:hidden bg-gray-800 p-4 shadow-xl border-t border-gray-700">
+            {/* Thông tin User (Mobile) */}
+            {user && (
+              <div className="flex items-center justify-between p-3 mb-3 bg-gray-900 rounded-xl">
+                <div className="flex items-center space-x-3">
+                  {user.avatar ? (
+                    <img src={user.avatar} alt="Avatar" className="h-10 w-10 rounded-full object-cover border border-gray-600" />
+                  ) : (
+                    <UserCircleIcon className="h-10 w-10 text-gray-400" />
+                  )}
+                  <div>
+                    {/* ✅ HIỂN THỊ CÂU CHÀO THEO GIỜ Ở ĐÂY (Mobile) */}
+                    <p className="text-sm font-semibold text-white">
+                      {getGreeting()}, {user.name}!
+                    </p>
+                    <p className="text-xs text-gray-400">{user.email}</p>
+                  </div>
+                </div>
+                <button onClick={logout} className="p-2 text-red-400 bg-red-400/10 rounded-lg">
+                  <ArrowRightOnRectangleIcon className="h-5 w-5" />
+                </button>
+              </div>
+            )}
+
+            {/* Các link điều hướng Mobile */}
+            {displayMenuItems.map((item) => {
+              const Icon = item.icon;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => {
+                    setActiveTab(item.id);
+                    setIsMobileOpen(false);
+                  }}
+                  className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg mb-1 ${
+                    activeTab === item.id ? "bg-blue-600/20 text-blue-400" : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                  }`}
+                >
+                  <Icon className="h-5 w-5" />
+                  <span>{item.name}</span>
+                </button>
+              );
+            })}
+
+            {!user && (
+              <div className="mt-4 pt-4 border-t border-gray-700 flex flex-col space-y-2">
+                <a href="/login" className="w-full text-center px-4 py-2 text-gray-300 bg-gray-700 rounded-lg">Đăng nhập</a>
+                <a href="/register" className="w-full text-center px-4 py-2 bg-blue-600 text-white rounded-lg">Đăng ký</a>
+              </div>
+            )}
           </div>
         )}
       </nav>

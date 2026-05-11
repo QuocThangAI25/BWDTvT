@@ -3,6 +3,10 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const connectDB = require("./src/config/db");
 
+// 1. IMPORT FILE ROUTER CỦA BẠN VÀO ĐÂY
+// (Lưu ý: Nếu thư mục routes nằm trong src thì đổi thành "./src/routes/auth")
+const authRoutes = require("./src/routes/auth"); 
+
 // Load environment variables
 dotenv.config();
 
@@ -16,7 +20,13 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Routes (sẽ thêm sau)
+// ==========================================
+// 2. GẮN ROUTE /api/auth VÀO ỨNG DỤNG
+// Từ giờ mọi request gửi đến /api/auth/... sẽ được đưa cho file auth.js xử lý
+app.use("/api/auth", authRoutes);
+// ==========================================
+
+// Routes mặc định
 app.get("/", (req, res) => {
   res.json({
     message: "🎓 TvT LMS API Server",

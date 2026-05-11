@@ -109,6 +109,16 @@ const Login = () => {
               </div>
             </div>
 
+            <div className="flex justify-end mt-2">
+                <a 
+                  href="/forgot-password" 
+                  className="text-sm text-blue-400 hover:text-blue-300 font-medium transition-colors"
+                >
+                  Quên mật khẩu?
+                </a>
+              </div>
+              {/* ================================== */}
+
             <button
               type="submit"
               disabled={loading}
