@@ -4,9 +4,8 @@ import {
   XMarkIcon,
   PaperAirplaneIcon,
   SparklesIcon,
-  MicrophoneIcon,
-  FaceSmileIcon,
 } from "@heroicons/react/24/outline";
+import api from "../../services/api";
 
 const Chatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -14,21 +13,27 @@ const Chatbot = () => {
     {
       id: 1,
       type: "bot",
-      text: "Xin chào! Tôi là trợ lý ảo thông minh của TvT. Tôi có thể giúp gì cho bạn hôm nay? 🎓✨",
+      text: "Xin chào! Tôi là trợ lý AI thông minh của TvT. Hãy hỏi tôi bất cứ điều gì về khóa học nhé! 🎓✨",
       timestamp: new Date(),
     },
   ]);
   const [inputMessage, setInputMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [chatHistory, setChatHistory] = useState([]);
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    scrollToBottom();
   }, [messages]);
 
-  const handleSendMessage = () => {
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const handleSendMessage = async () => {
     if (!inputMessage.trim()) return;
 
+    // Thêm tin nhắn user
     const userMessage = {
       id: messages.length + 1,
       type: "user",
@@ -36,24 +41,55 @@ const Chatbot = () => {
       timestamp: new Date(),
     };
     setMessages((prev) => [...prev, userMessage]);
+
+    // Lưu vào lịch sử
+    const newHistory = [
+      ...chatHistory,
+      { role: "user", content: inputMessage },
+    ];
+    setChatHistory(newHistory);
+
+    const question = inputMessage;
     setInputMessage("");
     setIsTyping(true);
 
-    setTimeout(() => {
-      const responses = [
-        "Cảm ơn bạn đã quan tâm! TvT có hơn 200+ khóa học chất lượng cao. Bạn muốn học lĩnh vực nào? 🚀",
-        "Tuyệt vời! Theo sở thích của bạn, tôi đề xuất khóa học React & Next.js. Bạn có muốn xem chi tiết không? 💡",
-        "Chúng tôi có khóa học phù hợp với trình độ của bạn. Hãy xem danh sách đề xuất ở trang chủ nhé! 🌟",
-      ];
+    try {
+      // Gọi API backend
+      const response = await api.post("/chat/send", {
+        message: question,
+        history: newHistory,
+      });
+
       const botMessage = {
         id: messages.length + 2,
         type: "bot",
-        text: responses[Math.floor(Math.random() * responses.length)],
+        text: response.data.response,
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, botMessage]);
+      setChatHistory((prev) => [
+        ...prev,
+        { role: "assistant", content: response.data.response },
+      ]);
+    } catch (error) {
+      console.error("Chat error:", error);
+      const errorMessage = {
+        id: messages.length + 2,
+        type: "bot",
+        text: "Xin lỗi, tôi đang gặp vấn đề kết nối. Vui lòng thử lại sau! 🙏",
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+    } finally {
       setIsTyping(false);
-    }, 1500);
+    }
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
   };
 
   return (
@@ -61,20 +97,17 @@ const Chatbot = () => {
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 group"
+          className="fixed bottom-6 right-6 group z-50"
         >
           <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full blur opacity-75 group-hover:opacity-100 transition duration-300 animate-pulse"></div>
           <div className="relative bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 rounded-full shadow-2xl hover:scale-110 transition-transform duration-300">
             <ChatBubbleLeftRightIcon className="h-6 w-6" />
-            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center animate-bounce">
-              1
-            </span>
           </div>
         </button>
       )}
 
       {isOpen && (
-        <div className="fixed bottom-6 right-6 w-96 h-[600px] bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-2xl flex flex-col z-50 border border-gray-200 animate-slide-up overflow-hidden">
+        <div className="fixed bottom-6 right-6 w-96 h-[600px] bg-white rounded-2xl shadow-2xl flex flex-col z-50 border border-gray-200 animate-slide-up overflow-hidden">
           {/* Header */}
           <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-4">
             <div className="flex items-center justify-between">
@@ -108,7 +141,7 @@ const Chatbot = () => {
                 className={`flex ${msg.type === "user" ? "justify-end" : "justify-start"} animate-fadeInUp`}
               >
                 <div
-                  className={`max-w-[80%] ${msg.type === "user" ? "order-2" : "order-1"}`}
+                  className={`max-w-[85%] ${msg.type === "user" ? "order-2" : "order-1"}`}
                 >
                   <div className="flex items-start space-x-2">
                     {msg.type === "bot" && (
@@ -120,10 +153,10 @@ const Chatbot = () => {
                       className={`rounded-2xl p-3 ${
                         msg.type === "user"
                           ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg"
-                          : "bg-white text-gray-800 shadow-md border border-gray-100"
+                          : "bg-gray-100 text-gray-800 shadow-md"
                       }`}
                     >
-                      <p className="text-sm">{msg.text}</p>
+                      <p className="text-sm whitespace-pre-wrap">{msg.text}</p>
                       <span
                         className={`text-xs mt-1 block ${msg.type === "user" ? "text-blue-100" : "text-gray-400"}`}
                       >
@@ -134,9 +167,10 @@ const Chatbot = () => {
                 </div>
               </div>
             ))}
+
             {isTyping && (
               <div className="flex justify-start animate-fadeInUp">
-                <div className="bg-white rounded-2xl p-3 shadow-md">
+                <div className="bg-gray-100 rounded-2xl p-3">
                   <div className="flex space-x-1">
                     <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
                     <div
@@ -151,33 +185,31 @@ const Chatbot = () => {
                 </div>
               </div>
             )}
+
             <div ref={messagesEndRef} />
           </div>
 
           {/* Input */}
           <div className="p-4 border-t border-gray-200 bg-white">
             <div className="flex items-center space-x-2">
-              <button className="p-2 text-gray-400 hover:text-blue-600 transition-colors">
-                <FaceSmileIcon className="h-5 w-5" />
-              </button>
-              <input
-                type="text"
+              <textarea
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
-                onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
+                onKeyPress={handleKeyPress}
                 placeholder="Nhập câu hỏi của bạn..."
-                className="flex-1 border border-gray-300 rounded-xl p-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="flex-1 resize-none border border-gray-300 rounded-xl p-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                rows="1"
               />
               <button
                 onClick={handleSendMessage}
-                disabled={!inputMessage.trim()}
+                disabled={!inputMessage.trim() || isTyping}
                 className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-2 rounded-xl hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <PaperAirplaneIcon className="h-5 w-5" />
               </button>
             </div>
             <p className="text-xs text-center text-gray-400 mt-2">
-              ✨ TvT AI gợi ý khóa học phù hợp với bạn
+              ✨ TvT AI - Trả lời mọi câu hỏi về khóa học
             </p>
           </div>
         </div>
